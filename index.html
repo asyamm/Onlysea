@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>seagamingrblx</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #27AEB9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        #search-input {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+            font-size: 16px;
+        }
+        #search-button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+        }
+        #search-button:hover {
+            background-color: #45a049;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        .image-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .image-container {
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+        }
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.5s;
+        }
+        .image-card:hover img {
+            transform: scale(1.05);
+        }
+        .image-info {
+            padding: 15px;
+        }
+        .image-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .image-desc {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .no-results {
+            text-align: center;
+            color: #666;
+            margin-top: 50px;
+            font-size: 18px;
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+<body>
+    <h1>onlysea script link</h1>
+    
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Cari script...">
+        <button id="search-button">Cari</button>
+    </div>
+    
+    <div class="gallery" id="gallery"></div>
+
+    <script>
+        // Data gambar landscape dengan deskripsi
+        const imageData = [
+            { 
+                imgSrc: "https://i.postimg.cc/nLQy5wtq/IMG-20250718-WA0077.jpg",
+                pastebinLink: "https://pastebin.com/abc123",
+                title: "restoran ofi dan hery",
+                description: "nasi goreng buatan hery"
+            },
+            { 
+                imgSrc: "https://images.unsplash.com/photo-1510784722466-f2aa9c52fff6", 
+                pastebinLink: "https://pastebin.com/def456",
+                title: "Pantai Tropis",
+                description: "Pantai berpasir putih dengan air laut biru jernih dan pohon kelapa."
+            },
+            { 
+                imgSrc: "https://images.unsplash.com/photo-1501785888041-af3ef285b470", 
+                pastebinLink: "https://pastebin.com/ghi789",
+                title: "Danau Musim Gugur",
+                description: "Permukaan danau yang tenang dikelilingi pepohonan dengan daun berwarna oranye kemerahan."
+            },
+            { 
+                imgSrc: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05", 
+                pastebinLink: "https://pastebin.com/jkl012",
+                title: "Hutan Berkabut",
+                description: "Kabut pagi menyelimuti hutan pinus yang hijau dan segar."
+            },
+            { 
+                imgSrc: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d", 
+                pastebinLink: "https://pastebin.com/mno345",
+                title: "Hutan Hujan",
+                description: "Hutan tropis yang lebat dengan sinar matahari menembus kanopi pohon."
+            }
+        ];
+
+        // Fungsi untuk menampilkan gambar dengan deskripsi
+        function displayImages(images) {
+            const gallery = document.getElementById("gallery");
+            gallery.innerHTML = "";
+
+            if (images.length === 0) {
+                gallery.innerHTML = '<p class="no-results">Tidak ada hasil yang ditemukan</p>';
+                return;
+            }
+
+            images.forEach(image => {
+                // Buat card container
+                const card = document.createElement("div");
+                card.className = "image-card";
+                
+                // Container gambar
+                const imageContainer = document.createElement("div");
+                imageContainer.className = "image-container";
+                
+                // Link dan gambar
+                const link = document.createElement("a");
+                link.href = image.pastebinLink;
+                link.target = "_blank";
+                
+                const img = document.createElement("img");
+                img.src = image.imgSrc;
+                img.alt = image.title;
+                img.loading = "lazy";
+                
+                link.appendChild(img);
+                imageContainer.appendChild(link);
+                
+                // Info gambar (deskripsi)
+                const infoDiv = document.createElement("div");
+                infoDiv.className = "image-info";
+                
+                const title = document.createElement("div");
+                title.className = "image-title";
+                title.textContent = image.title;
+                
+                const desc = document.createElement("div");
+                desc.className = "image-desc";
+                desc.textContent = image.description;
+                
+                infoDiv.appendChild(title);
+                infoDiv.appendChild(desc);
+                
+                // Gabungkan semua elemen
+                card.appendChild(imageContainer);
+                card.appendChild(infoDiv);
+                gallery.appendChild(card);
+            });
+        }
+
+        // Fungsi pencarian
+        function searchImages() {
+            const searchTerm = document.getElementById("search-input").value.toLowerCase();
+            const filteredImages = imageData.filter(image => 
+                image.title.toLowerCase().includes(searchTerm) || 
+                image.description.toLowerCase().includes(searchTerm)
+            );
+            displayImages(filteredImages);
+        }
+
+        // Event listeners
+        document.getElementById("search-button").addEventListener("click", searchImages);
+        document.getElementById("search-input").addEventListener("keyup", function(event) {
+            if (event.key === "Enter") searchImages();
+        });
+
+        // Tampilkan semua gambar saat pertama kali load
+        displayImages(imageData);
+    </script>
+</body>
+</html>
