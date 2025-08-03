@@ -3,212 +3,1200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>seagamingrblx</title>
+    <title>✨ Ultimate To-Do List ✨</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        :root {
+            /* Theme Colors */
+            --theme-1: #6c63ff;
+            --theme-2: #ff6584;
+            --theme-3: #20bf55;
+            --theme-4: #ff9a3c;
+            --theme-5: #3a86ff;
+            
+            /* Dark Mode Defaults */
+            --bg-color: #1e1e2e;
+            --card-bg: #2a2a3a;
+            --text-color: #e0e0e0;
+            --primary: var(--theme-1);
+            --primary-hover: #8d83ff;
+            --danger: #ff5e5e;
+            --warning: #ffb84d;
+            --success: #6dd96d;
+            --border-radius: 12px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .light-mode {
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --primary: var(--theme-1);
+            --primary-hover: #7a72ff;
+        }
+
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            transition: var(--transition);
             padding: 20px;
-            background-color: #27AEB9;
         }
-        h1 {
-            text-align: center;
-            color: #333;
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        .search-container {
+
+        header {
             display: flex;
-            justify-content: center;
-            margin: 20px 0;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        #search-input {
-            padding: 10px;
-            width: 300px;
-            border: 1px solid #ddd;
-            border-radius: 5px 0 0 5px;
-            font-size: 16px;
+
+        .light-mode header {
+            border-bottom-color: rgba(0, 0, 0, 0.1);
         }
-        #search-button {
-            padding: 10px 15px;
-            background-color: #4CAF50;
-            color: white;
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--primary), #a18fff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theme-toggle {
+            background: none;
             border: none;
-            border-radius: 0 5px 5px 0;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(30deg);
+        }
+
+        .control-panel {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .control-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        input, select, button {
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        #taskInput {
+            width: 100%;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            padding-right: 50px;
+            box-shadow: var(--shadow);
+        }
+
+        #addButton {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
         }
-        #search-button:hover {
-            background-color: #45a049;
+
+        #addButton:hover {
+            background: var(--primary-hover);
+            transform: translateY(-50%) scale(1.1);
         }
-        .gallery {
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        #searchInput {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            box-shadow: var(--shadow);
+        }
+
+        #priorityFilter, #projectFilter {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            min-width: 120px;
+        }
+
+        .main-content {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+        }
+
+        @media (max-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .task-section {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+            min-height: 300px;
+        }
+
+        .task-item {
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: var(--transition);
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.4s ease forwards;
+            border-left: 4px solid var(--priority-color, var(--primary));
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .task-item.dragging {
+            opacity: 0.8;
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .task-checkbox {
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .task-checkbox:checked {
+            background: var(--primary);
+        }
+
+        .task-checkbox:checked::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: white;
+            font-size: 12px;
+        }
+
+        .task-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .task-text {
+            font-size: 1.1rem;
+            word-break: break-word;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 10px;
+            font-size: 0.85rem;
+            opacity: 0.8;
+            flex-wrap: wrap;
+        }
+
+        .task-priority {
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .priority-high {
+            background-color: rgba(255, 94, 94, 0.2);
+            color: var(--danger);
+        }
+
+        .priority-medium {
+            background-color: rgba(255, 184, 77, 0.2);
+            color: var(--warning);
+        }
+
+        .priority-low {
+            background-color: rgba(109, 217, 109, 0.2);
+            color: var(--success);
+        }
+
+        .task-project {
+            background-color: rgba(122, 111, 240, 0.2);
+            color: var(--primary);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+        }
+
+        .task-date {
+            background-color: rgba(58, 134, 255, 0.2);
+            color: var(--theme-5);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .task-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            opacity: 0.5;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-btn:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .task-btn.delete:hover {
+            color: var(--danger);
+        }
+
+        .task-btn.edit:hover {
+            color: var(--primary);
+        }
+
+        .completed .task-text {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .completed .task-checkbox {
+            border-color: #aaa;
+            background: #aaa;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .stats-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .stats-title {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary), var(--primary-hover));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .chart-container {
+            height: 200px;
             margin-top: 20px;
         }
-        .image-card {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
+
+        .projects-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
         }
-        .image-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+
+        .projects-title {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
         }
-        .image-container {
-            width: 100%;
-            height: 500px;
-            overflow: hidden;
+
+        .projects-list {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
-        .image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+
+        .project-tag {
+            background-color: var(--card-bg);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
             cursor: pointer;
-            transition: transform 0.5s;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(122, 111, 240, 0.3);
         }
-        .image-card:hover img {
-            transform: scale(1.05);
+
+        .project-tag:hover {
+            transform: translateY(-2px);
         }
-        .image-info {
-            padding: 15px;
+
+        .project-tag.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
-        .image-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #333;
+
+        .theme-selector {
+            margin-top: 20px;
         }
-        .image-desc {
-            color: #666;
-            font-size: 14px;
-            line-height: 1.4;
+
+        .theme-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
         }
-        .no-results {
+
+        .theme-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .theme-option:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-option.selected {
+            border-color: var(--text-color);
+            transform: scale(1.1);
+        }
+
+        .theme-1 { background-color: var(--theme-1); }
+        .theme-2 { background-color: var(--theme-2); }
+        .theme-3 { background-color: var(--theme-3); }
+        .theme-4 { background-color: var(--theme-4); }
+        .theme-5 { background-color: var(--theme-5); }
+
+        .empty-state {
             text-align: center;
-            color: #666;
-            margin-top: 50px;
-            font-size: 18px;
-            grid-column: 1 / -1;
+            padding: 30px;
+            opacity: 0.7;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        /* Drag and drop styles */
+        .task-item.drag-over {
+            border: 2px dashed var(--primary);
+            background-color: rgba(122, 111, 240, 0.1);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .filter-group {
+                flex-direction: column;
+            }
+            
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .task-actions {
+                align-self: flex-end;
+                margin-top: 10px;
+            }
+        }
+
+        /* Date picker styling */
+        .date-picker {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: none;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: inherit;
         }
     </style>
 </head>
 <body>
-    <h1>onlysea script link</h1>
-    
-    <div class="search-container">
-        <input type="text" id="search-input" placeholder="Cari script...">
-        <button id="search-button">Cari</button>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-tasks"></i> Ultimate To-Do</h1>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </header>
+
+        <div class="control-panel">
+            <div class="input-group">
+                <input type="text" id="taskInput" placeholder="Add a new task...">
+                <button id="addButton"><i class="fas fa-plus"></i></button>
+            </div>
+            
+            <div class="filter-group">
+                <input type="text" id="searchInput" placeholder="Search tasks...">
+                <select id="priorityFilter">
+                    <option value="all">All Priorities</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+                <select id="projectFilter">
+                    <option value="all">All Projects</option>
+                    <!-- Projects will be added dynamically -->
+                </select>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="task-section">
+                <h2><i class="fas fa-list-check"></i> Your Tasks</h2>
+                <div class="task-list" id="taskList">
+                    <!-- Tasks will be added here dynamically -->
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3>No tasks found</h3>
+                        <p>Add a new task to get started</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="stats-card">
+                    <div class="stats-title">
+                        <i class="fas fa-chart-line"></i> Productivity Stats
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalTasks">0</div>
+                            <div class="stat-label">Total Tasks</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="completedTasks">0</div>
+                            <div class="stat-label">Completed</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="highPriority">0</div>
+                            <div class="stat-label">High Priority</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="activeProjects">0</div>
+                            <div class="stat-label">Projects</div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="productivityChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="projects-card">
+                    <div class="projects-title">
+                        <i class="fas fa-folder"></i> Projects
+                    </div>
+                    <div class="projects-list" id="projectsList">
+                        <!-- Projects will be added here dynamically -->
+                    </div>
+                </div>
+
+                <div class="stats-card theme-selector">
+                    <div class="stats-title">
+                        <i class="fas fa-palette"></i> Theme Color
+                    </div>
+                    <div class="theme-options">
+                        <div class="theme-option theme-1 selected" data-theme="1"></div>
+                        <div class="theme-option theme-2" data-theme="2"></div>
+                        <div class="theme-option theme-3" data-theme="3"></div>
+                        <div class="theme-option theme-4" data-theme="4"></div>
+                        <div class="theme-option theme-5" data-theme="5"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    
-    <div class="gallery" id="gallery"></div>
 
     <script>
-        // Data gambar landscape dengan deskripsi
-        const imageData = [
-            { 
-                imgSrc: "https://i.postimg.cc/nLQy5wtq/IMG-20250718-WA0077.jpg",
-                pastebinLink: "https://pastebin.com/abc123",
-                title: "restoran ofi dan hery",
-                description: "nasi goreng buatan hery"
-            },
-            { 
-                imgSrc: "https://images.unsplash.com/photo-1510784722466-f2aa9c52fff6", 
-                pastebinLink: "https://pastebin.com/def456",
-                title: "Pantai Tropis",
-                description: "Pantai berpasir putih dengan air laut biru jernih dan pohon kelapa."
-            },
-            { 
-                imgSrc: "https://images.unsplash.com/photo-1501785888041-af3ef285b470", 
-                pastebinLink: "https://pastebin.com/ghi789",
-                title: "Danau Musim Gugur",
-                description: "Permukaan danau yang tenang dikelilingi pepohonan dengan daun berwarna oranye kemerahan."
-            },
-            { 
-                imgSrc: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05", 
-                pastebinLink: "https://pastebin.com/jkl012",
-                title: "Hutan Berkabut",
-                description: "Kabut pagi menyelimuti hutan pinus yang hijau dan segar."
-            },
-            { 
-                imgSrc: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d", 
-                pastebinLink: "https://pastebin.com/mno345",
-                title: "Hutan Hujan",
-                description: "Hutan tropis yang lebat dengan sinar matahari menembus kanopi pohon."
-            }
-        ];
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elements
+            const themeToggle = document.getElementById('themeToggle');
+            const taskInput = document.getElementById('taskInput');
+            const addButton = document.getElementById('addButton');
+            const taskList = document.getElementById('taskList');
+            const searchInput = document.getElementById('searchInput');
+            const priorityFilter = document.getElementById('priorityFilter');
+            const projectFilter = document.getElementById('projectFilter');
+            const projectsList = document.getElementById('projectsList');
+            const themeOptions = document.querySelectorAll('.theme-option');
+            const totalTasksEl = document.getElementById('totalTasks');
+            const completedTasksEl = document.getElementById('completedTasks');
+            const highPriorityEl = document.getElementById('highPriority');
+            const activeProjectsEl = document.getElementById('activeProjects');
+            const ctx = document.getElementById('productivityChart').getContext('2d');
 
-        // Fungsi untuk menampilkan gambar dengan deskripsi
-        function displayImages(images) {
-            const gallery = document.getElementById("gallery");
-            gallery.innerHTML = "";
+            // State
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            let projects = JSON.parse(localStorage.getItem('projects')) || ['General', 'Work', 'Personal'];
+            let currentProject = 'all';
+            let currentTheme = localStorage.getItem('theme') || '1';
+            let isDarkMode = localStorage.getItem('darkMode') === 'true' || 
+                           (!localStorage.getItem('darkMode') && 
+                            window.matchMedia('(prefers-color-scheme: dark)').matches);
+            let productivityChart;
 
-            if (images.length === 0) {
-                gallery.innerHTML = '<p class="no-results">Tidak ada hasil yang ditemukan</p>';
-                return;
-            }
+            // Initialize
+            initTheme();
+            initChart();
+            renderProjects();
+            renderTasks();
+            setupDragAndDrop();
+            updateStats();
 
-            images.forEach(image => {
-                // Buat card container
-                const card = document.createElement("div");
-                card.className = "image-card";
-                
-                // Container gambar
-                const imageContainer = document.createElement("div");
-                imageContainer.className = "image-container";
-                
-                // Link dan gambar
-                const link = document.createElement("a");
-                link.href = image.pastebinLink;
-                link.target = "_blank";
-                
-                const img = document.createElement("img");
-                img.src = image.imgSrc;
-                img.alt = image.title;
-                img.loading = "lazy";
-                
-                link.appendChild(img);
-                imageContainer.appendChild(link);
-                
-                // Info gambar (deskripsi)
-                const infoDiv = document.createElement("div");
-                infoDiv.className = "image-info";
-                
-                const title = document.createElement("div");
-                title.className = "image-title";
-                title.textContent = image.title;
-                
-                const desc = document.createElement("div");
-                desc.className = "image-desc";
-                desc.textContent = image.description;
-                
-                infoDiv.appendChild(title);
-                infoDiv.appendChild(desc);
-                
-                // Gabungkan semua elemen
-                card.appendChild(imageContainer);
-                card.appendChild(infoDiv);
-                gallery.appendChild(card);
+            // Event Listeners
+            themeToggle.addEventListener('click', toggleDarkMode);
+            addButton.addEventListener('click', addTask);
+            taskInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addTask();
             });
-        }
+            searchInput.addEventListener('input', filterTasks);
+            priorityFilter.addEventListener('change', filterTasks);
+            projectFilter.addEventListener('change', (e) => {
+                currentProject = e.target.value;
+                filterTasks();
+            });
+            
+            themeOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    setTheme(option.dataset.theme);
+                });
+            });
 
-        // Fungsi pencarian
-        function searchImages() {
-            const searchTerm = document.getElementById("search-input").value.toLowerCase();
-            const filteredImages = imageData.filter(image => 
-                image.title.toLowerCase().includes(searchTerm) || 
-                image.description.toLowerCase().includes(searchTerm)
-            );
-            displayImages(filteredImages);
-        }
+            // Functions
+            function initTheme() {
+                // Set dark/light mode
+                if (isDarkMode) {
+                    document.body.classList.remove('light-mode');
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                } else {
+                    document.body.classList.add('light-mode');
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                }
+                
+                // Set color theme
+                setTheme(currentTheme, false);
+            }
 
-        // Event listeners
-        document.getElementById("search-button").addEventListener("click", searchImages);
-        document.getElementById("search-input").addEventListener("keyup", function(event) {
-            if (event.key === "Enter") searchImages();
+            function toggleDarkMode() {
+                isDarkMode = !isDarkMode;
+                localStorage.setItem('darkMode', isDarkMode);
+                initTheme();
+            }
+
+            function setTheme(themeNumber, save = true) {
+                currentTheme = themeNumber;
+                if (save) localStorage.setItem('theme', themeNumber);
+                
+                // Update CSS variables
+                document.documentElement.style.setProperty('--primary', `var(--theme-${themeNumber})`);
+                document.documentElement.style.setProperty('--primary-hover', getHoverColor(themeNumber));
+                
+                // Update selected theme indicator
+                themeOptions.forEach(option => {
+                    option.classList.remove('selected');
+                    if (option.dataset.theme === themeNumber) {
+                        option.classList.add('selected');
+                    }
+                });
+                
+                // Re-render tasks to update priority colors
+                renderTasks();
+            }
+
+            function getHoverColor(themeNumber) {
+                const colors = {
+                    '1': '#8d83ff',
+                    '2': '#ff7b94',
+                    '3': '#30d96d',
+                    '4': '#ffaa5c',
+                    '5': '#5a9cff'
+                };
+                return colors[themeNumber] || '#8d83ff';
+            }
+
+            function addTask() {
+                const text = taskInput.value.trim();
+                if (!text) return;
+
+                const newTask = {
+                    id: Date.now(),
+                    text,
+                    completed: false,
+                    priority: 'medium',
+                    project: 'General',
+                    dueDate: null,
+                    createdAt: new Date().toISOString()
+                };
+
+                tasks.unshift(newTask);
+                saveTasks();
+                renderTasks();
+                taskInput.value = '';
+                taskInput.focus();
+                updateStats();
+
+                // Add project if it's new
+                if (!projects.includes(newTask.project)) {
+                    projects.push(newTask.project);
+                    saveProjects();
+                    renderProjects();
+                }
+            }
+
+            function renderTasks() {
+                taskList.innerHTML = '';
+                
+                const filteredTasks = filterTasks();
+                
+                if (filteredTasks.length === 0) {
+                    taskList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h3>No tasks found</h3>
+                            <p>${searchInput.value ? 'Try a different search' : 'Add a new task to get started'}</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                filteredTasks.forEach(task => {
+                    const taskElement = document.createElement('div');
+                    taskElement.className = `task-item ${task.completed ? 'completed' : ''}`;
+                    taskElement.dataset.id = task.id;
+                    taskElement.draggable = true;
+                    taskElement.style.setProperty('--priority-color', getPriorityColor(task.priority));
+                    
+                    // Format due date if exists
+                    let dueDateDisplay = '';
+                    if (task.dueDate) {
+                        const dueDate = new Date(task.dueDate);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        
+                        let dateStr = dueDate.toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric' 
+                        });
+                        
+                        if (dueDate < today && !task.completed) {
+                            dateStr += ' (Overdue)';
+                        }
+                        
+                        dueDateDisplay = `<span class="task-date">📅 ${dateStr}</span>`;
+                    }
+                    
+                    taskElement.innerHTML = `
+                        <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''}>
+                        <div class="task-content">
+                            <div class="task-text">${task.text}</div>
+                            <div class="task-meta">
+                                <span class="task-priority priority-${task.priority}">${task.priority}</span>
+                                <span class="task-project">${task.project}</span>
+                                ${dueDateDisplay}
+                            </div>
+                        </div>
+                        <div class="task-actions">
+                            <button class="task-btn edit"><i class="fas fa-pen"></i></button>
+                            <button class="task-btn delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+
+                    // Add event listeners
+                    const checkbox = taskElement.querySelector('.task-checkbox');
+                    const editBtn = taskElement.querySelector('.edit');
+                    const deleteBtn = taskElement.querySelector('.delete');
+
+                    checkbox.addEventListener('change', () => {
+                        task.completed = checkbox.checked;
+                        saveTasks();
+                        taskElement.classList.toggle('completed', task.completed);
+                        updateStats();
+                    });
+
+                    editBtn.addEventListener('click', () => editTask(task, taskElement));
+                    deleteBtn.addEventListener('click', () => deleteTask(task.id));
+
+                    // Drag events
+                    taskElement.addEventListener('dragstart', () => {
+                        taskElement.classList.add('dragging');
+                    });
+
+                    taskElement.addEventListener('dragend', () => {
+                        taskElement.classList.remove('dragging');
+                    });
+
+                    taskList.appendChild(taskElement);
+                });
+            }
+
+            function getPriorityColor(priority) {
+                const colors = {
+                    'high': '#ff5e5e',
+                    'medium': '#ffb84d',
+                    'low': '#6dd96d'
+                };
+                return colors[priority] || '#6c63ff';
+            }
+
+            function editTask(task, element) {
+                const contentDiv = element.querySelector('.task-content');
+                const oldContent = contentDiv.innerHTML;
+                
+                // Format date for input
+                const dueDateValue = task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '';
+                
+                contentDiv.innerHTML = `
+                    <input type="text" class="edit-input" value="${task.text}" style="width:100%; padding:8px; margin-bottom:8px;">
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <select class="edit-priority" style="flex:1; min-width:100px; padding:5px;">
+                            <option value="high" ${task.priority === 'high' ? 'selected' : ''}>High</option>
+                            <option value="medium" ${task.priority === 'medium' ? 'selected' : ''}>Medium</option>
+                            <option value="low" ${task.priority === 'low' ? 'selected' : ''}>Low</option>
+                        </select>
+                        <select class="edit-project" style="flex:1; min-width:100px; padding:5px;">
+                            ${projects.map(proj => 
+                                `<option value="${proj}" ${task.project === proj ? 'selected' : ''}>${proj}</option>`
+                            ).join('')}
+                        </select>
+                        <input type="date" class="date-picker edit-date" value="${dueDateValue}" style="flex:1; min-width:120px;">
+                    </div>
+                    <div style="display:flex; gap:8px; margin-top:8px;">
+                        <button class="save-edit" style="flex:1; padding:8px; background:var(--primary); color:white; border:none; border-radius:4px;">Save</button>
+                        <button class="cancel-edit" style="flex:1; padding:8px; background:var(--danger); color:white; border:none; border-radius:4px;">Cancel</button>
+                    </div>
+                `;
+                
+                const saveBtn = contentDiv.querySelector('.save-edit');
+                const cancelBtn = contentDiv.querySelector('.cancel-edit');
+                const input = contentDiv.querySelector('.edit-input');
+                
+                input.focus();
+                
+                saveBtn.addEventListener('click', () => {
+                    const newText = input.value.trim();
+                    const newPriority = contentDiv.querySelector('.edit-priority').value;
+                    const newProject = contentDiv.querySelector('.edit-project').value;
+                    const newDate = contentDiv.querySelector('.edit-date').value;
+                    
+                    if (newText) {
+                        task.text = newText;
+                        task.priority = newPriority;
+                        task.project = newProject;
+                        task.dueDate = newDate ? new Date(newDate).toISOString() : null;
+                        
+                        // Add project if it's new
+                        if (!projects.includes(newProject)) {
+                            projects.push(newProject);
+                            saveProjects();
+                            renderProjects();
+                        }
+                        
+                        saveTasks();
+                        renderTasks();
+                        updateStats();
+                    }
+                });
+                
+                cancelBtn.addEventListener('click', () => {
+                    contentDiv.innerHTML = oldContent;
+                    // Reattach event listeners
+                    const checkbox = element.querySelector('.task-checkbox');
+                    const editBtn = element.querySelector('.edit');
+                    const deleteBtn = element.querySelector('.delete');
+                    
+                    checkbox.addEventListener('change', () => {
+                        task.completed = checkbox.checked;
+                        saveTasks();
+                        element.classList.toggle('completed', task.completed);
+                        updateStats();
+                    });
+                    
+                    editBtn.addEventListener('click', () => editTask(task, element));
+                    deleteBtn.addEventListener('click', () => deleteTask(task.id));
+                });
+            }
+
+            function deleteTask(id) {
+                tasks = tasks.filter(task => task.id !== id);
+                saveTasks();
+                renderTasks();
+                updateStats();
+            }
+
+            function filterTasks() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const priority = priorityFilter.value;
+                const project = currentProject;
+                
+                let filtered = tasks.filter(task => {
+                    const matchesSearch = task.text.toLowerCase().includes(searchTerm);
+                    const matchesPriority = priority === 'all' || task.priority === priority;
+                    const matchesProject = project === 'all' || task.project === project;
+                    return matchesSearch && matchesPriority && matchesProject;
+                });
+
+                renderTaskList(filtered);
+                return filtered;
+            }
+
+            function renderTaskList(filteredTasks) {
+                const currentElements = Array.from(taskList.children);
+                
+                // Remove elements that shouldn't be there
+                currentElements.forEach(el => {
+                    if (el.dataset.id) {
+                        const id = parseInt(el.dataset.id);
+                        if (!filteredTasks.some(task => task.id === id)) {
+                            el.style.animation = 'fadeOut 0.3s ease';
+                            setTimeout(() => el.remove(), 300);
+                        }
+                    }
+                });
+
+                // Add new elements in correct order
+                filteredTasks.forEach(task => {
+                    const existingEl = document.querySelector(`.task-item[data-id="${task.id}"]`);
+                    if (!existingEl) {
+                        const taskElement = createTaskElement(task);
+                        taskList.appendChild(taskElement);
+                    }
+                });
+
+                // Reorder elements to match filtered order
+                filteredTasks.forEach(task => {
+                    const el = document.querySelector(`.task-item[data-id="${task.id}"]`);
+                    if (el) taskList.appendChild(el);
+                });
+            }
+
+            function createTaskElement(task) {
+                const taskElement = document.createElement('div');
+                taskElement.className = `task-item ${task.completed ? 'completed' : ''}`;
+                taskElement.dataset.id = task.id;
+                taskElement.draggable = true;
+                taskElement.style.setProperty('--priority-color', getPriorityColor(task.priority));
+                
+                // Format due date if exists
+                let dueDateDisplay = '';
+                if (task.dueDate) {
+                    const dueDate = new Date(task.dueDate);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    let dateStr = dueDate.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric' 
+                    });
+                    
+                    if (dueDate < today && !task.completed) {
+                        dateStr += ' (Overdue)';
+                    }
+                    
+                    dueDateDisplay = `<span class="task-date">📅 ${dateStr}</span>`;
+                }
+                
+                taskElement.innerHTML = `
+                    <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''}>
+                    <div class="task-content">
+                        <div class="task-text">${task.text}</div>
+                        <div class="task-meta">
+                            <span class="task-priority priority-${task.priority}">${task.priority}</span>
+                            <span class="task-project">${task.project}</span>
+                            ${dueDateDisplay}
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="task-btn edit"><i class="fas fa-pen"></i></button>
+                        <button class="task-btn delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+
+                // Add event listeners
+                const checkbox = taskElement.querySelector('.task-checkbox');
+                const editBtn = taskElement.querySelector('.edit');
+                const deleteBtn = taskElement.querySelector('.delete');
+
+                checkbox.addEventListener('change', () => {
+                    task.completed = checkbox.checked;
+                    saveTasks();
+                    taskElement.classList.toggle('completed', task.completed);
+                    updateStats();
+                });
+
+                editBtn.addEventListener('click', () => editTask(task, taskElement));
+                deleteBtn.addEventListener('click', () => deleteTask(task.id));
+
+                // Drag events
+                taskElement.addEventListener('dragstart', () => {
+                    taskElement.classList.add('dragging');
+                });
+
+                taskElement.addEventListener('dragend', () => {
+                    taskElement.classList.remove('dragging');
+                });
+
+                return taskElement;
+            }
+
+            function renderProjects() {
+                projectsList.innerHTML = '';
+                
+                // Update project filter dropdown
+                projectFilter.innerHTML = '<option value="all">All Projects</option>';
+                projects.forEach(project => {
+                    projectFilter.innerHTML += `<option value="${project}">${project}</option>`;
+                });
+                
+                // Render project tags
+                ['all', ...projects].forEach(project => {
+                    const tag = document.createElement('div');
+                    tag.className = `project-tag ${currentProject === project ? 'active' : ''}`;
+                    tag.textContent = project === 'all' ? 'All Projects' : project;
+                    tag.addEventListener('click', () => {
+                        currentProject = project;
+                        document.querySelectorAll('.project-tag').forEach(t => 
+                            t.classList.remove('active')
+                        );
+                        tag.classList.add('active');
+                        projectFilter.value = project;
+                        filterTasks();
+                    });
+                    projectsList.appendChild(tag);
+                });
+            }
+
+            function updateStats() {
+                // Calculate stats
+                const total = tasks.length;
+                const completed = tasks.filter(t => t.completed).length;
+                const highPriority = tasks.filter(t => t.priority === 'high').length;
+                const uniqueProjects = [...new Set(tasks.map(t => t.project))].length;
+                
+                // Update DOM
+                totalTasksEl.textContent = total;
+                completedTasksEl.textContent = completed;
+                highPriorityEl.textContent = highPriority;
+                activeProjectsEl.textContent = uniqueProjects;
+                
+                // Update chart
+                updateChart();
+            }
+
+            function initChart() {
+                productivityChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Completed', 'High Priority', 'Medium', 'Low'],
+                        datasets: [{
+                            data: [0, 0, 0, 0],
+                            backgroundColor: [
+                                '#6dd96d',
+                                '#ff5e5e',
+                                '#ffb84d',
+                                '#6c63ff'
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: var(--text-color),
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '70%'
+                    }
+                });
+            }
+
+            function updateChart() {
+                const completed = tasks.filter(t => t.completed).length;
+                const highPriority = tasks.filter(t => t.priority === 'high' && !t.completed).length;
+                const mediumPriority = tasks.filter(t => t.priority === 'medium' && !t.completed).length;
+                const lowPriority = tasks.filter(t => t.priority === 'low' && !t.completed).length;
+                
+                productivityChart.data.datasets[0].data = [
+                    completed,
+                    highPriority,
+                    mediumPriority,
+                    lowPriority
+                ];
+                
+                productivityChart.update();
+            }
+
+            function saveTasks() {
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+            }
+
+            function saveProjects() {
+                localStorage.setItem('projects', JSON.stringify(projects));
+            }
+
+            function setupDragAndDrop() {
+                taskList.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    const afterElement = getDragAfterElement(taskList, e.clientY);
+                    const draggingItem = document.querySelector('.dragging');
+                    
+                    if (afterElement == null) {
+                        taskList.appendChild(draggingItem);
+                    } else {
+                        taskList.insertBefore(draggingItem, afterElement);
+                    }
+                });
+
+                taskList.addEventListener('dragend', () => {
+                    // Update tasks order based on new DOM order
+                    const newOrder = Array.from(taskList.children)
+                        .map(el => tasks.find(task => task.id === parseInt(el.dataset.id)))
+                        .filter(task => task); // Remove undefined
+                    
+                    tasks = newOrder;
+                    saveTasks();
+                });
+            }
+
+            function getDragAfterElement(container, y) {
+                const draggableElements = [...container.querySelectorAll('.task-item:not(.dragging)')];
+                
+                return draggableElements.reduce((closest, child) => {
+                    const box = child.getBoundingClientRect();
+                    const offset = y - box.top - box.height / 2;
+                    
+                    if (offset < 0 && offset > closest.offset) {
+                        return { offset: offset, element: child };
+                    } else {
+                        return closest;
+                    }
+                }, { offset: Number.NEGATIVE_INFINITY }).element;
+            }
         });
-
-        // Tampilkan semua gambar saat pertama kali load
-        displayImages(imageData);
     </script>
 </body>
-</html>
+    </html>
